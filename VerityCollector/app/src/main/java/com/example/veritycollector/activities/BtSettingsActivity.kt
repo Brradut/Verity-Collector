@@ -38,6 +38,7 @@ import com.example.veritycollector.R
 import com.example.veritycollector.services.HRService
 import com.example.veritycollector.ui.theme.VerityCollectorTheme
 import com.example.veritycollector.utils.PermissionsUtils
+import java.security.Permission
 
 class BtSettingsActivity: ComponentActivity() {
 
@@ -60,6 +61,9 @@ class BtSettingsActivity: ComponentActivity() {
     }
 
     private fun checkBT() {
+        PermissionsUtils.requestLocationPermission(this)
+        PermissionsUtils.requestBTPermission(this)
+
         val btManager = applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
         val bluetoothAdapter: BluetoothAdapter? = btManager.adapter
         if (bluetoothAdapter == null) {

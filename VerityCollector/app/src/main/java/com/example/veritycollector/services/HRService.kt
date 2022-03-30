@@ -15,6 +15,8 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationCompat
+import com.example.veritycollector.model.PPIEntry
+import com.example.veritycollector.repository.PPIEntryRepository
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiCallback
 import com.polar.sdk.api.PolarBleApiDefaultImpl.defaultImplementation
@@ -24,9 +26,13 @@ import com.polar.sdk.api.model.PolarHrData
 import com.polar.sdk.api.model.PolarOhrPPIData
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
+import kotlinx.coroutines.*
 import java.util.*
 
 class HRService: Service() {
+
+    private val job = SupervisorJob()
+    val scope = CoroutineScope(Dispatchers.Main + job)
 
     private val TAG = "HR_SERVICE"
 
@@ -68,15 +74,15 @@ class HRService: Service() {
     }
 
     //PPI streaming functions
-    fun streamPPI(){
+    fun streamPPI(identifier: String){
         if (ppiDisposable == null){
-            ppiDisposable = api.startOhrPPIStreaming(deviceId)
+            ppiDisposable = api.startOhrPPIStreaming(identifier)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     {
                         polarPPIData: PolarOhrPPIData ->
-                        Log.d(TAG, "PPI received")
-                        sendPPIToServer(polarPPIData)
+                        Log.d(TAG, "PPI received: ${polarPPIData.samples.map { x->x.ppi }} ${identifier} ${polarPPIData.timeStamp}")
+                        scope.launch { sendPPIToServer(polarPPIData, identifier)}
                     },
                     {
                         error: Throwable ->
@@ -92,11 +98,22 @@ class HRService: Service() {
         }
     }
 
-    //TODO Implement the saving of the data
-    fun sendPPIToServer(data: PolarOhrPPIData){
-        Log.d("PPI", "PPI data: ${data.samples.map { x->x.ppi }}")
-    }
+    suspend fun sendPPIToServer(data: PolarOhrPPIData, identifier: String){
+        var tmsp = System.currentTimeMillis()
+//        var tmsps = data.samples.map { x-> x.ppi.toLong() } as MutableList
+//        var i = tmsps.size - 1
+//        while(i >= 0){
+//            tmsps[i] = tmsp
+//            tmsp = tmsp - data.samples[i].ppi
+//            i--
+//        }
+        var i = 0
+        while(i < data.samples.size){
+            PPIEntryRepository.addPPIEntry(PPIEntry(data.samples[i].ppi, tmsp, identifier))
+            i++
+        }
 
+    }
 
     inner class LocalBinder : Binder() {
         fun getService(): HRService {
@@ -133,7 +150,7 @@ class HRService: Service() {
                 for (feature in features) {
                     Log.d(TAG, "Streaming feature is ready: $feature")
                     if(feature == PolarBleApi.DeviceStreamingFeature.PPI)
-                         streamPPI()
+                         streamPPI(identifier)
                 }
             }
 

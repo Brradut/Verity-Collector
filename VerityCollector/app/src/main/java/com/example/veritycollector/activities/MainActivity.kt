@@ -37,15 +37,18 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Column(modifier = Modifier.fillMaxSize().offset(0.dp, 60.dp), verticalArrangement = Arrangement.spacedBy(60.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         Button(onClick = {
-                            PropertyUtils.setNotificationInterval()
-                            val intent = Intent(context, AddEntryActivity::class.java)
-                            startActivity(intent)
+//                            PropertyUtils.setNotificationInterval()
+//                            val intent = Intent(context, AddEntryActivity::class.java)
+//                            startActivity(intent)
+                            val i = packageManager.getLaunchIntentForPackage("com.psy.ubbcluj.ro.moodwheel")
+                            startActivity(i)
                         }) {
                             Text(text = "Add Entry", fontSize = 30.sp)
                         }
                         Button(onClick = {
                             val intent = Intent(context, BtSettingsActivity::class.java)
                             startActivity(intent)
+
                         }) {
                             Text(text = "Bluetooth Settings", fontSize = 30.sp)
                         }
@@ -64,10 +67,10 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun PickTime(){
+fun PickTime(componentText:String){
     Row(modifier = Modifier.size(120.dp, 60.dp), horizontalArrangement = Arrangement.Center) {
         val dialogState = rememberMaterialDialogState()
-        var timeString = remember { mutableStateOf("Pick time") }
+        var timeString = remember { mutableStateOf(componentText) }
         MaterialDialog(
             dialogState = dialogState,
             buttons = {

@@ -1,8 +1,9 @@
 package com.example.veritycollector.activities
 
+import android.content.ComponentName
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.widget.NumberPicker
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -37,8 +38,8 @@ class NotificationSettingsActivity: ComponentActivity() {
                                 horizontalArrangement = Arrangement.Center,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                PickTime()
-                                PickTime()
+                                PickTime("Start time")
+                                PickTime("End time")
                             }
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -70,7 +71,8 @@ class NotificationSettingsActivity: ComponentActivity() {
                         }
                         Row(){
                             val btnText = remember{mutableStateOf("Enable Notifications")}
-                            Button(onClick = { if(btnText.value == "Enable Notifications") btnText.value = "Disable Notifications" else btnText.value = "Enable Notifications"}){
+                            Button(onClick = { if(btnText.value == "Enable Notifications") btnText.value = "Disable Notifications" else btnText.value = "Enable Notifications"
+                             }){
                                 Text(text = btnText.value, fontSize = 25.sp)
                             }
                         }

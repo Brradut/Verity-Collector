@@ -21,5 +21,9 @@ class PropertyUtils {
             prefsProperties.store(FileOutputStream(this.javaClass.classLoader.getResource("prefs.properties").path),"")
         }
 
+        fun getRESTEndpoint():String{
+            return configProperties.getProperty("url")
+        }
+
     }
 }

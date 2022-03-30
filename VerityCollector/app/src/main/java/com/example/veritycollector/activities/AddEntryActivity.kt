@@ -52,8 +52,8 @@ class AddEntryActivity : ComponentActivity() {
                             Text("Interval")
                         }
                         Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.Center) {
-                            PickTime()
-                            PickTime()
+                            PickTime("Start time")
+                            PickTime("End time")
                         }
                         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier
                             .fillMaxWidth()

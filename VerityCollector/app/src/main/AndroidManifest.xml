@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.veritycollector">
+    <queries>
+        <package android:name="com.psy.ubbcluj.ro.moodwheel" />
+    </queries>
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission
@@ -34,6 +37,8 @@
         android:name="android.permission.ACCESS_COARSE_LOCATION"
         android:maxSdkVersion="30" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -66,6 +71,7 @@
             android:parentActivityName=".activities.MainActivity"
             ></activity>
         <service android:name=".services.HRService" />
+
     </application>
 
 </manifest>
