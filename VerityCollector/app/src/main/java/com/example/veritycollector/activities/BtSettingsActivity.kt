@@ -7,10 +7,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -34,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.preference.PreferenceManager
 import com.example.veritycollector.R
 import com.example.veritycollector.services.HRService
 import com.example.veritycollector.ui.theme.VerityCollectorTheme
@@ -67,7 +65,7 @@ class BtSettingsActivity: ComponentActivity() {
         val btManager = applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
         val bluetoothAdapter: BluetoothAdapter? = btManager.adapter
         if (bluetoothAdapter == null) {
-            Toast.makeText(applicationContext, "Device doesn't support Bluetooth", Toast.LENGTH_SHORT)
+            Toast.makeText(applicationContext, "Device doesn't support Bluetooth", Toast.LENGTH_LONG)
             return
         }
 
@@ -95,7 +93,7 @@ class BtSettingsActivity: ComponentActivity() {
             for (index in 0..grantResults.lastIndex) {
                 if (grantResults[index] == PackageManager.PERMISSION_DENIED) {
                     Log.w(TAG, "Needed permissions are missing")
-                    Toast.makeText(applicationContext, "Needed permissions are missing", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "Needed permissions are missing", Toast.LENGTH_LONG).show()
                     return
                 }
             }
@@ -116,14 +114,17 @@ class BtSettingsActivity: ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background){
                     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(60.dp), modifier = Modifier.offset(0.dp, 60.dp)) {
-                        val textState = remember { mutableStateOf("") }
+                        val textState = remember { mutableStateOf(PreferenceManager.getDefaultSharedPreferences(applicationContext).getString("device_id", "")) }
                         Column() {
                             Text(text = "Device ID:", fontSize = 25.sp)
                             OutlinedTextField(
                                 modifier = Modifier
                                     .fillMaxWidth(),
-                                value = textState.value,
-                                onValueChange = { textState.value = it },
+                                value = textState.value!!,
+                                onValueChange = {
+                                    textState.value = it
+                                    PreferenceManager.getDefaultSharedPreferences(applicationContext).edit().putString("device_id", it).apply()
+                                                },
                                 label = {
                                     Text(
                                         text = "Device ID"
