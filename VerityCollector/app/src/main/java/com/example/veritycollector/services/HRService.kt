@@ -16,6 +16,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationCompat
 import com.example.veritycollector.model.PPIEntry
+import com.example.veritycollector.model.RREntry
 import com.example.veritycollector.repository.PPIEntryRepository
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiCallback
@@ -35,10 +36,14 @@ class HRService: Service() {
     val scope = CoroutineScope(Dispatchers.Main + job)
 
     private val TAG = "HR_SERVICE"
+    private var sentSuccess = false
+    private var sentSuccess2 = false
+
 
     private var notificationManager: NotificationManager? = null
     private val NOTIFICATION_CHANNEL_ID = "MoodWheel_PERMANENT"
     private var deviceId : String = ""
+    private var deviceId2: String = ""
     private val binder: IBinder =LocalBinder()
 
     private lateinit var api: PolarBleApi
@@ -50,7 +55,7 @@ class HRService: Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val name = "Real time HR"
             val descriptionText = "Notification for recording heart rate"
-            val importance = NotificationManager.IMPORTANCE_LOW
+            val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance).apply {
                 description = descriptionText
                 vibrationPattern = longArrayOf()
@@ -65,8 +70,8 @@ class HRService: Service() {
         if(notificationManager == null)
             notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         var builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Heart rate reader")
-            .setContentText("Heart rate is being measured\nBattery level: ${batteryPercent}%")
+            .setContentTitle("Verity Collector")
+            .setContentText("Verity Collector is running\nHeart rate is being measured Battery level: ${batteryPercent}%")
             .setSmallIcon(androidx.core.R.drawable.notification_icon_background)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setOngoing(true)
@@ -99,6 +104,10 @@ class HRService: Service() {
     }
 
     suspend fun sendPPIToServer(data: PolarOhrPPIData, identifier: String){
+        if(sentSuccess == false){
+            Toast.makeText(applicationContext, "Verity data is now being recorded", Toast.LENGTH_LONG).show()
+            sentSuccess = true
+        }
         var tmsp = System.currentTimeMillis()
 //        var tmsps = data.samples.map { x-> x.ppi.toLong() } as MutableList
 //        var i = tmsps.size - 1
@@ -112,8 +121,23 @@ class HRService: Service() {
             PPIEntryRepository.addPPIEntry(PPIEntry(data.samples[i].ppi, tmsp, identifier))
             i++
         }
+    }
+
+    suspend fun sendRRToServer(data: PolarHrData, identifier: String){
+        if(sentSuccess2 == false){
+            Toast.makeText(applicationContext, "H10 data is now being recorded", Toast.LENGTH_LONG).show()
+            sentSuccess2 = true
+        }
+        var tmsp = System.currentTimeMillis()
+
+        var i = 0
+        while (i < data.rrsMs.size){
+            PPIEntryRepository.addRREntry(RREntry(data.rrsMs[i],tmsp, identifier))
+        i++
+        }
 
     }
+
 
     inner class LocalBinder : Binder() {
         fun getService(): HRService {
@@ -159,6 +183,10 @@ class HRService: Service() {
                 notificationManager?.notify(1, createNotification(batteryLevel))
             }
 
+            override fun hrNotificationReceived(identifier: String, data: PolarHrData) {
+               Log.d(TAG, "HR data received from $identifier: ${data.rrsMs}")
+                scope.launch { sendRRToServer(data, identifier)}
+            }
         })
 
         Log.d(TAG, "onCreate")
@@ -168,12 +196,15 @@ class HRService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         deviceId = intent?.getStringExtra("deviceId").toString()
+        deviceId2 = intent?.getStringExtra("deviceId2").toString()
         try{
             api.connectToDevice(deviceId)
             Log.d(TAG, deviceId)
-        }catch (a: PolarInvalidArgument){
-           a.printStackTrace()
-            Toast.makeText(applicationContext, "Failed to connect to device $deviceId", Toast.LENGTH_SHORT)
+            Log.d(TAG, deviceId2)
+            api.connectToDevice(deviceId2)
+            }catch (a: PolarInvalidArgument){
+            a.printStackTrace()
+            Toast.makeText(applicationContext, "Failed to connect to device $deviceId OR $deviceId2", Toast.LENGTH_SHORT)
         }
         Log.d(TAG, "onStart")
         return super.onStartCommand(intent, flags, startId)

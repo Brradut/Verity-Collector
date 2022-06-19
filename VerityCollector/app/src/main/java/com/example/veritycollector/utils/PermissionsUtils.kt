@@ -2,7 +2,9 @@ package com.example.veritycollector.utils
 
 import android.Manifest
 import android.app.Activity
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 
@@ -16,6 +18,7 @@ class PermissionsUtils {
         val BLUETOOTH_PERMISSIONS_S =arrayOf(Manifest.permission.BLUETOOTH_SCAN,
         Manifest.permission.BLUETOOTH_CONNECT)
 
+        @RequiresApi(Build.VERSION_CODES.S)
         @AfterPermissionGranted(REQUEST_ENABLE_BT)
         fun requestBTPermission(activity: Activity?) {
             val perms = arrayOf(Manifest.permission.BLUETOOTH_SCAN,

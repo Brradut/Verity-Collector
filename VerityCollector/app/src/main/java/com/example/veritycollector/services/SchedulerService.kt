@@ -17,10 +17,13 @@ class SchedulerService: Service() {
     }
 
     override fun onCreate() {
-       startForeground(0, createNotification())
+        super.onCreate()
+        Log.d("TAG", "Scheduler started")
+        startForeground(2, createNotification())
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d("TAG", "on start command")
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -44,8 +47,8 @@ class SchedulerService: Service() {
         if(notificationManager == null)
             notificationManager = getSystemService(Service.NOTIFICATION_SERVICE) as NotificationManager
         var builder = NotificationCompat.Builder(this, "ongoing_notification_notification_service")
-            .setContentTitle("How are you feeling?")
-            .setContentText("Please complete the questionnaire: ")
+            .setContentTitle("Verity Collector Notifications")
+            .setContentText("Service for Notifications")
             .setSmallIcon(androidx.core.R.drawable.notification_icon_background)
             .setContentIntent(PendingIntent.getActivity(this, 0, packageManager.getLaunchIntentForPackage("com.example.veritycollector"), PendingIntent.FLAG_IMMUTABLE))
             .setOngoing(true)

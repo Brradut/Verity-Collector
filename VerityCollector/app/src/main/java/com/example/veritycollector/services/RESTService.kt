@@ -1,6 +1,7 @@
 package com.example.veritycollector.services
 
 import com.example.veritycollector.model.PPIEntry
+import com.example.veritycollector.model.RREntry
 import com.example.veritycollector.utils.PropertyUtils
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -11,6 +12,8 @@ import retrofit2.http.POST
 interface RESTService{
  @POST("ppi_entry")
  suspend fun addPPIEntry(@Body ppi_entry: PPIEntry):Response<Unit>
+ @POST("rr_entry")
+ suspend fun addRREntry(@Body rr_entry: RREntry):Response<Unit>
 }
 
 class ServiceBuilder{

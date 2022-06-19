@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.veritycollector.services.SchedulerService
 import com.example.veritycollector.ui.theme.Purple200
 import com.example.veritycollector.ui.theme.Purple500
 import com.example.veritycollector.utils.PropertyUtils
@@ -31,6 +32,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val context = this as Context
+
+//        val serviceIntent = Intent(context, SchedulerService::class.java)
+//        context?.startForegroundService(serviceIntent)
+
         setContent {
             VerityCollectorTheme {
                 // A surface container using the 'background' color from the theme

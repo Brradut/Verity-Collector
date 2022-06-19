@@ -19,7 +19,7 @@ class MyIntentService: IntentService("name") {
 
     override fun onHandleIntent(intent: Intent?) {
         var not = createNotification()
-        notificationManager?.notify(2, not)
+        notificationManager?.notify(3, not)
         AlarmUtils.startAlarms(this)
     }
 

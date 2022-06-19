@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission
         android:name="android.permission.BLUETOOTH_SCAN"
-        android:usesPermissionFlags="neverForLocation" />
+         />
 
     <!-- Polar SDK needs Bluetooth connect permission to connect for found BLE devices.-->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
@@ -85,6 +85,7 @@
         android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
         <intent-filter>
             <action android:name="android.intent.action.BOOT_COMPLETED" />
+            <action android:name="android.intent.action.REBOOT"></action>
         </intent-filter>
     </receiver>
 
